@@ -421,15 +421,12 @@
         }
 
         .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 25px;
-            padding: 8px 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
-        }
+                display: none;
+            }
+
+            .mobile-search-btn {
+                display: block;
+            }
 
         .search-box:focus-within {
             border-color: var(--text-primary);
@@ -938,6 +935,51 @@
             font-size: 14px;
         }
 
+        .mobile-search-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-search-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 2500;
+            padding: 20px;
+        }
+
+        .mobile-search-overlay.active {
+            display: block;
+        }
+
+        .mobile-search-overlay .search-box {
+            display: flex;
+            width: 100%;
+            margin-top: 60px;
+        }
+
+        .mobile-search-overlay .search-box input {
+            width: 100%;
+        }
+
+        .mobile-search-close {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            float: left;
+        }
+        
         /* Responsive Design */
         @media (max-width: 768px) {
             .header {
@@ -1053,10 +1095,13 @@
                 <a href="#" class="nav-link">الأفلام</a>
                 <a href="#" class="nav-link">المسلسلات</a>
                 <a href="#" class="nav-link">قائمتي</a>
-                <div class="search-box">
+<div class="search-box">
                     <input type="text" id="searchInput" placeholder="ابحث عن فيلم...">
                     <button onclick="searchMovies()"><i class="fas fa-search"></i></button>
                 </div>
+                <button class="mobile-search-btn" onclick="openMobileSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
                 <div class="user-menu">
                     <button class="btn-login-nav" id="loginNavBtn" onclick="openLogin()">
                         <i class="fas fa-user"></i> تسجيل الدخول
@@ -1072,7 +1117,16 @@
             </nav>
         </div>
     </header>
-
+<div class="mobile-search-overlay" id="mobileSearchOverlay">
+        <button class="mobile-search-close" onclick="closeMobileSearch()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="search-box">
+            <input type="text" id="mobileSearchInput" placeholder="ابحث عن فيلم...">
+            <button onclick="searchMoviesMobile()"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+    
     <!-- Hero Section -->
     <section class="hero-section" id="heroSection">
         <div class="hero-backdrop" id="heroBackdrop"></div>
@@ -1867,7 +1921,30 @@
             displayMovies('topRatedMovies', movies.sort((a, b) => b.rating - a.rating));
             updateHeroSection(movies[0]);
         }
+function openMobileSearch() {
+            document.getElementById('mobileSearchOverlay').classList.add('active');
+        }
 
+        function closeMobileSearch() {
+            document.getElementById('mobileSearchOverlay').classList.remove('active');
+        }
+
+        function searchMoviesMobile() {
+            const query = document.getElementById('mobileSearchInput').value.toLowerCase();
+            if (!query) return;
+            const results = movies.filter(m => 
+                m.title.toLowerCase().includes(query) || 
+                m.genre.toLowerCase().includes(query)
+            );
+            closeMobileSearch();
+            if (results.length > 0) {
+                displayMovies('latestMovies', results);
+                document.querySelector('.movies-section').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert('لم يتم العثور على نتائج');
+            }
+        }
+        
         // Make functions globally accessible
         window.openLogin = openLogin;
         window.closeLogin = closeLogin;
@@ -1876,6 +1953,9 @@
         window.checkAuthAndOpenModal = checkAuthAndOpenModal;
         window.filterMovies = filterMovies;
         window.searchMovies = searchMovies;
+        window.openMobileSearch = openMobileSearch;
+        window.closeMobileSearch = closeMobileSearch;
+        window.searchMoviesMobile = searchMoviesMobile;
         window.closeModal = closeModal;
         window.playMovie = playMovie;
         window.showMovieInfo = showMovieInfo;
