@@ -1181,10 +1181,29 @@
             </div>
 
             <div class="login-tabs">
-                <button class="login-tab active" onclick="switchLoginTab('register', this)">حساب جديد</button>
+                <button class="login-tab active" onclick="switchLoginTab('login', this)">تسجيل الدخول</button>
+                <button class="login-tab" onclick="switchLoginTab('register', this)">حساب جديد</button>
             </div>
 
-            <div class="login-form-section active" id="registerFormSection">
+            <div class="login-form-section active" id="loginFormSection">
+                <div class="login-field">
+                    <label>البريد الإلكتروني (Gmail)</label>
+                    <i class="ti ti-mail fi"></i>
+                    <input type="email" id="loginEmail" placeholder="example@gmail.com" />
+                </div>
+                <div class="login-field">
+                    <label>كلمة المرور</label>
+                    <i class="ti ti-lock fi"></i>
+                    <input type="password" id="loginPassword" placeholder="••••••" />
+                </div>
+                <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+                    <i class="ti ti-login"></i>
+                    تسجيل الدخول
+                </button>
+                <div class="login-alert" id="loginAlert"></div>
+            </div>
+
+            <div class="login-form-section" id="registerFormSection">
                 <div class="login-field">
                     <label>البريد الإلكتروني (Gmail)</label>
                     <i class="ti ti-mail fi"></i>
@@ -1343,7 +1362,7 @@
 
     <script type="module">
         import { initializeApp } from "firebase/app";
-        import { getAuth, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA8Y4sB3azEejGT79FEMa5InO29cWxw8j4",
@@ -1754,6 +1773,46 @@
             btn.classList.add('active');
             document.getElementById('loginAlert').className = 'login-alert';
             document.getElementById('regAlert').className = 'login-alert';
+        }
+
+        window.handleLogin = async function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value.trim();
+            const btn = document.getElementById('loginBtn');
+
+            if (!email || !pass) {
+                showAlert('loginAlert', 'يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ti ti-loader-2"></i> جاري تسجيل الدخول...';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                showAlert('loginAlert', '✅ تم تسجيل الدخول بنجاح!', 'success');
+                showToast('✅ مرحباً بعودتك!', 'success');
+                setTimeout(() => {
+                    closeLogin();
+                    clearLoginForm();
+                }, 1000);
+            } catch (e) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ti ti-login"></i> تسجيل الدخول';
+                if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+                    showAlert('loginAlert', 'البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
+                } else {
+                    showAlert('loginAlert', 'حدث خطأ، حاول مرة أخرى: ' + e.message, 'error');
+                }
+            }
+        }
+
+        function clearLoginForm() {
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginAlert').className = 'login-alert';
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('loginBtn').innerHTML = '<i class="ti ti-login"></i> تسجيل الدخول';
         }
 
         window.handleRegister = async function() {
