@@ -1206,7 +1206,7 @@
 
             <div class="login-form-section" id="registerFormSection">
                 <div class="login-field">
-                    <label>your name</label>
+                    <label> add a name</label>
                     <i class="ti ti-lock fi"></i>
                     <input type="password" id="regPassword" placeholder="" />
                 </div>
@@ -1216,7 +1216,7 @@
                     <input type="email" id="regEmail" placeholder="example@gmail.com" />
                 </div>
                 <div class="login-field">
-                    <label>gmail password </label>
+                    <label> gmail password</label>
                     <i class="ti ti-user fi"></i>
                     <input type="text" id="regName" placeholder="*******" />
                 </div>
@@ -2063,6 +2063,27 @@
         }
 
         // يبني واجهة تشغيل حلقة محددة
+        // يدخل الشاشة الكاملة بشكل متوافق مع جميع المتصفحات والأجهزة
+        function enterFullscreen(el) {
+            if (!el) return;
+            try {
+                if (el.requestFullscreen) {
+                    el.requestFullscreen().catch(() => {});
+                } else if (el.webkitRequestFullscreen) {
+                    el.webkitRequestFullscreen();
+                } else if (el.webkitEnterFullscreen) {
+                    // iOS Safari video tag
+                    el.webkitEnterFullscreen();
+                } else if (el.mozRequestFullScreen) {
+                    el.mozRequestFullScreen();
+                } else if (el.msRequestFullscreen) {
+                    el.msRequestFullscreen();
+                }
+            } catch (e) {
+                console.log('Fullscreen not supported:', e);
+            }
+        }
+
         function renderEpisodePlayer(movie, episode) {
             const modalDetails = document.getElementById('modalDetails');
             modalDetails.innerHTML = `
@@ -2094,6 +2115,13 @@
             currentEpisodeId = episodeNumber;
 
             renderEpisodePlayer(movie, episode);
+
+            // تفعيل الشاشة الكاملة تلقائياً بعد الضغط على الحلقة (بادرة نقر المستخدم تسمح بذلك)
+            setTimeout(() => {
+                const wrapper = document.querySelector('.video-player-wrapper');
+                const target = wrapper ? (wrapper.querySelector('iframe') || wrapper.querySelector('video') || wrapper) : null;
+                enterFullscreen(target);
+            }, 150);
         }
 
         window.backToEpisodesList = function(movieId) {
@@ -2183,7 +2211,7 @@
                 video.play();
                 showToast('🎬 جارٍ تشغيل الفيلم...', 'info');
             } else {
-                showToast(' الفيديو غير متوفر حالياً.', 'error');
+                showToast('الفيديو غير متوفر حالياً.', 'error');
             }
         }
 
