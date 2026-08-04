@@ -1414,7 +1414,7 @@
     videoUrl: "",
     subtitleUrl: "",
     episodes: [
-        { number: 1, title: "الحلقة 1", videoUrl: "https://drive.google.com/file/d/1LSGGf6hQChH_ohsH_0P2xqTH-nTRJXdq/view?usp=drive_link", subtitleUrl: "https://drive.google.com/file/d/1jxWMpmsWcQEmtb6ys0Eb0Rb2MUR2LdJn/view?usp=drive_link" },
+        { number: 1, title: "الحلقة 1", videoUrl: "https://drive.google.com/file/d/1LSGGf6hQChH_ohsH_0P2xqTH-nTRJXdq/view?usp=drive_link", subtitleUrl: "" },
         { number: 2, title: "الحلقة 2", videoUrl: "", subtitleUrl: "" },
         { number: 3, title: "الحلقة 3", videoUrl: "", subtitleUrl: "" },
         { number: 4, title: "الحلقة 4", videoUrl: "", subtitleUrl: "" },
@@ -1577,8 +1577,8 @@
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOUAi3zv4aoF2LOPpo6f81cE3_BgrB39qz_t8WC3t71A&s=10",
     backdrop: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOUAi3zv4aoF2LOPpo6f81cE3_BgrB39qz_t8WC3t71A&s=10",
     description: "صراع ملحمي على العرش الحديدي بين أعظم العائلات النبيلة في مملكة وستيروس، بينما تهدد قوى الظلام من الشمال بمحو كل شيء...",
-    videoUrl: "https://drive.google.com/file/d/1K7kLGAMz5oYtkjeiblqLSI19XHtGChKl/view?usp=drive_link",
-    subtitleUrl: "https://drive.google.com/file/d/1W59za-kcQoW4AZU__g_mZ4isoxgMmklx/view?usp=drive_link"
+    videoUrl: "",
+    subtitleUrl: ""
 }, {
     id: 14,
     title: "your fault",
@@ -2206,9 +2206,6 @@
                 } else {
                     currentSeriesId = null;
                     currentEpisodeId = null;
-                    const trackTag = movie.subtitleUrl
-                        ? `<track src="${movie.subtitleUrl}" kind="subtitles" srclang="ar" label="العربية" default>`
-                        : '';
                     modalDetails.innerHTML = `
                         <h2>${movie.title}</h2>
                         <div class="modal-meta">
@@ -2217,13 +2214,7 @@
                             <span>${movie.quality}</span>
                             <span>${movie.genre}</span>
                         </div>
-                        <div class="video-player-wrapper">
-                            <video id="moviePlayer" controls>
-                                <source src="${movie.videoUrl || ''}" type="video/mp4">
-                                ${trackTag}
-                                متصفحك لا يدعم تشغيل الفيديو
-                            </video>
-                        </div>
+                        ${buildVideoPlayerHtml(movie.videoUrl, movie.subtitleUrl)}
                         <p class="modal-description">${movie.description}</p>
                         <div class="modal-actions">
                             <button class="btn-play" onclick="playMovie()">
